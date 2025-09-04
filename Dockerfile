@@ -25,8 +25,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 
 # Installation Claude Code avec permissions root
-RUN npm install -g @anthropic-ai/claude-code --unsafe-perm=true --allow-root && \
-    ln -sf /usr/lib/node_modules/@anthropic-ai/claude-code/bin/claude /usr/local/bin/claude && \
+RUN curl -L -o /usr/local/bin/claude https://github.com/anthropics/claude-code/releases/latest/download/claude-linux-x64 && \
     chmod +x /usr/local/bin/claude
 
 # Permissions sudo pour l'utilisateur coder

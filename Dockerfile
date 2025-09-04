@@ -1,21 +1,35 @@
-# Utiliser une image Node.js récente
-FROM node:18-slim
+FROM codercom/code-server:4.19.1
 
-# Installer les dépendances système nécessaires
+# Variables d'environnement
+ENV PASSWORD=changeme123
+ENV SUDO_PASSWORD=changeme123
+
+# Mise à jour et installation des outils essentiels
+USER root
 RUN apt-get update && apt-get install -y \
     curl \
+    wget \
     git \
+    build-essential \
+    python3 \
+    python3-pip \
+    nodejs \
+    npm \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Créer un répertoire de travail
-WORKDIR /app
+# Installation de Claude Code CLI
+RUN curl -fsSL https://console.anthropic.com/install | sh
 
-# Installer Claude CLI globalement
-RUN npm install -g @anthropic-ai/claude-code
+# Création du répertoire de travail
+USER coder
+WORKDIR /home/coder/project
 
-# Copier votre script de démarrage
-COPY start.sh /app/start.sh
-RUN chmod +x /app/start.sh
+# Port d'exposition
+EXPOSE 8080
 
-# Commande de démarrage
-CMD ["/app/start.sh"]
+# Script de démarrage
+COPY --chown=coder:coder start.sh /home/coder/start.sh
+RUN chmod +x /home/coder/start.sh
+
+CMD ["/home/coder/start.sh"]

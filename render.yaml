@@ -11,6 +11,3 @@ services:
       - key: PORT
         value: 8080
     healthCheckPath: /healthz
-envVars:
-  - key: PASSWORD
-    generateValue: true  # Génère un mot de passe sécurisé

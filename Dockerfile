@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 USER root
 
-# Mise à jour système
+# Installation des outils de base
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
@@ -20,20 +20,22 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Installation de Node.js 20.x (version LTS récente)
+# Installation Node.js 20.x LTS
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs
 
-# Vérification des versions installées
-RUN node --version && npm --version
+# Installation Claude Code avec permissions root
+RUN npm install -g @anthropic-ai/claude-code --unsafe-perm=true --allow-root && \
+    ln -sf /usr/lib/node_modules/@anthropic-ai/claude-code/bin/claude /usr/local/bin/claude && \
+    chmod +x /usr/local/bin/claude
 
-# Permissions sudo
+# Permissions sudo pour l'utilisateur coder
 RUN echo "coder ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 USER coder
 WORKDIR /home/coder/project
 
-# Configuration Git de base et historique bash persistant
+# Configuration Git et historique bash
 RUN git config --global user.name "Remote Dev" && \
     git config --global user.email "dev@remote.local" && \
     git config --global init.defaultBranch main && \
@@ -43,10 +45,10 @@ RUN git config --global user.name "Remote Dev" && \
     echo 'shopt -s histappend' >> ~/.bashrc && \
     echo 'export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"' >> ~/.bashrc
 
-# Création de la structure de projet (corrigée)
+# Structure de projet
 RUN mkdir -p coding-projects mcp-components automation agenda-management
 
 EXPOSE 8080
 
-# Démarrage direct
+# Démarrage direct de code-server
 CMD ["/usr/bin/entrypoint.sh", "--bind-addr", "0.0.0.0:8080", "--auth", "password"]

@@ -18,8 +18,8 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Installation de Claude Code CLI (version corrigée)
-RUN npm install -g @anthropic-ai/claude-code || echo "⚠️ Claude Code installation failed"
+# Installation de Claude Code CLI
+RUN curl -fsSL https://console.anthropic.com/install | sh
 
 # Création du répertoire de travail
 USER coder
